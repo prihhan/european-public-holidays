@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>European Public Holidays</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>European Public Holidays</h1>
+        
+        <div class="controls">
+            <div class="custom-select-wrapper">
+                <div class="custom-select" id="customSelect">
+                    <div class="select-trigger">
+                        <span>Select a country...</span>
+                        <div class="arrow">▼</div>
+                    </div>
+                    <div class="options" id="countryOptions"></div>
+                </div>
+            </div>
+            <input type="number" id="yearInput" min="2020" max="2030" placeholder="Year">
+            <button id="loadBtn">Load Holidays</button>
+        </div>
+
+        <div id="loading" class="loading hidden">Loading...</div>
+        <div id="error" class="error hidden"></div>
+
+        <div id="bridgeDays" class="bridge-days"></div>
+        <div id="schoolHolidays" class="school-holidays"></div>
+
+        <div id="results" class="results"></div>
+        <div id="calendar" class="calendar"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

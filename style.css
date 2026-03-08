@@ -1,0 +1,467 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.custom-select-wrapper {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.select-trigger {
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.select-trigger:hover {
+    border-color: #667eea;
+}
+
+.select-trigger .arrow {
+    transition: transform 0.3s;
+    color: #667eea;
+}
+
+.custom-select.open .arrow {
+    transform: rotate(180deg);
+}
+
+.options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #667eea;
+    border-radius: 6px;
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.custom-select.open .options {
+    display: block;
+}
+
+.option {
+    padding: 10px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.option:hover {
+    background: #f0f0f0;
+}
+
+.option.selected {
+    background: #e3f2fd;
+}
+
+.option img {
+    width: 24px;
+    height: 18px;
+    border-radius: 2px;
+}
+
+select, input, button {
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+select {
+    width: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+    appearance: none;
+    padding-left: 12px;
+    background-color: white;
+}
+
+input {
+    width: 120px;
+}
+
+button {
+    background: #667eea;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #5568d3;
+}
+
+.loading, .error {
+    padding: 20px;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.loading {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.error {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.hidden {
+    display: none;
+}
+
+.bridge-days {
+    margin-bottom: 30px;
+}
+
+.bridge-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.bridge-container h3 {
+    color: white;
+}
+
+.bridge-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.2s;
+}
+
+.bridge-card:last-child {
+    margin-bottom: 0;
+}
+
+.bridge-card:hover {
+    transform: translateX(5px);
+}
+
+.bridge-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.bridge-content {
+    flex: 1;
+}
+
+.bridge-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.bridge-details {
+    color: #666;
+    font-size: 14px;
+}
+
+.school-holidays {
+    margin-bottom: 30px;
+}
+
+.school-holidays-container {
+    background: linear-gradient(135deg, #ffc9e5 0%, #ffb3d9 100%);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 182, 217, 0.3);
+}
+
+.school-holidays-container h3 {
+    color: #d63384;
+}
+
+.school-holiday-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.2s;
+}
+
+.school-holiday-card:last-child {
+    margin-bottom: 0;
+}
+
+.school-holiday-card:hover {
+    transform: translateX(5px);
+}
+
+.school-holiday-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.school-holiday-content {
+    flex: 1;
+}
+
+.school-holiday-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.school-holiday-details {
+    color: #666;
+    font-size: 14px;
+}
+
+.results {
+    display: block;
+}
+
+.holiday-list-container {
+    display: grid;
+    gap: 8px;
+    padding-top: 15px;
+}
+
+.holiday-card-compact {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border-left: 4px solid #667eea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.holiday-card-compact:hover {
+    background: #f8f9fa;
+    transform: translateX(3px);
+}
+
+.holiday-date-compact {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 14px;
+    min-width: 80px;
+}
+
+.holiday-name-compact {
+    font-size: 15px;
+    color: #333;
+    flex: 1;
+}
+
+.holiday-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+    transition: transform 0.2s;
+}
+
+.holiday-card:hover {
+    transform: translateX(5px);
+}
+
+.holiday-date {
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.holiday-name {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.holiday-type {
+    font-size: 14px;
+    color: #666;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.view-toggle button {
+    padding: 10px 20px;
+    background: #f0f0f0;
+    color: #333;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.view-toggle button.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.collapse-all-btn {
+    background: #f0f0f0;
+    color: #333;
+    border: 2px solid #ddd;
+}
+
+.collapse-all-btn:hover {
+    background: #e0e0e0;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.month {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.month-header {
+    font-weight: 700;
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+    padding: 5px;
+}
+
+.day-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: default;
+}
+
+.day-cell.empty {
+    background: transparent;
+}
+
+.day-cell.holiday {
+    background: #dc3545;
+    color: white;
+    font-weight: 700;
+    cursor: help;
+}
+
+.day-cell.holiday.shortened {
+    background: #ffc107;
+    color: #333;
+}
+
+.day-cell.holiday:hover {
+    background: #c82333;
+    transform: scale(1.1);
+    transition: all 0.2s;
+}
+
+.day-cell.holiday.shortened:hover {
+    background: #e0a800;
+}
+
+
+.day-cell.school-holiday {
+    background: #ffb6d9;
+    color: #333;
+    font-weight: 600;
+    cursor: help;
+}
+
+.day-cell.school-holiday:hover {
+    background: #ff99cc;
+    transform: scale(1.1);
+    transition: all 0.2s;
+}
