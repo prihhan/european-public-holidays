@@ -129,10 +129,7 @@ async function loadHolidays() {
     calendar.innerHTML = '';
 
     try {
-        const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${currentYear}/EE`);
-        if (!res.ok) throw new Error('Failed to fetch public holidays');
-        const publicHolidays = await res.json();
-
+        const publicHolidays = getEstonianPublicHolidays(currentYear);
         const schoolHolidays = getEstonianSchoolHolidays(currentYear);
 
         hideLoading();
@@ -258,7 +255,7 @@ function displayHolidays(holidays) {
         const date = new Date(holiday.date);
         card.innerHTML = `
             <div class="holiday-date-compact">${formatDate(date)}</div>
-            <div class="holiday-name-compact">${holiday.localName || holiday.name}</div>
+            <div class="holiday-name-compact">${currentLang === 'ru' ? (holiday.nameRu || holiday.name) : (holiday.localName || holiday.name)}</div>
         `;
         listContainer.appendChild(card);
     });
@@ -337,7 +334,7 @@ function displayCalendar(holidays, schoolHolidays, year) {
                 if (isShortened || (h.global === false && h.types && !h.types.includes('Public'))) {
                     cell.classList.add('shortened');
                 }
-                cell.title = `${h.localName || h.name}\n${h.types?.join(', ') || ''}`;
+                cell.title = `${currentLang === 'ru' ? (h.nameRu || h.name) : (h.localName || h.name)}\n${h.types?.join(', ') || ''}`;
             }
 
             cell.textContent = day;
@@ -711,8 +708,69 @@ function findOptimalBridgeDays(year, holidayDates, mainVacation, winterWeek) {
     return selected;
 }
 
-// ── Estonian school holidays (official) ──────────────────────────────────────
-// Source: Haridus- ja Teadusministeerium / Tallinna Haridusamet
+// ── Estonian public holidays (official, from riigipühad.ee) ──────────────────
+// Fixed holidays + Easter-based holidays calculated per year
+// Names: ET (Estonian), EN (English), RU (Russian)
+// Types: Riigipüha = public holiday, Rahvuspüha = national holiday
+
+function easterDate(year) {
+    // Anonymous Gregorian algorithm
+    const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+    const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4), k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31) - 1; // 0-indexed
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(year, month, day);
+}
+
+function addDays(date, days) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+}
+
+function toDateStr(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function getEstonianPublicHolidays(year) {
+    const easter = easterDate(year);
+    const goodFriday = addDays(easter, -2);
+    const whitSunday = addDays(easter, 49);
+
+    const holidays = [
+        { date: `${year}-01-01`, et: 'Uusaasta',                                          en: "New Year's Day",          ru: 'Новый год',                    type: 'Riigipüha' },
+        { date: `${year}-02-24`, et: 'Iseseisvuspäev, Eesti Vabariigi aastapäev',         en: 'Independence Day',        ru: 'День независимости',           type: 'Rahvuspüha' },
+        { date: toDateStr(goodFriday),  et: 'Suur reede',                                 en: 'Good Friday',             ru: 'Страстная пятница',            type: 'Riigipüha' },
+        { date: toDateStr(easter),      et: 'Ülestõusmispühade 1. püha',                  en: 'Easter Sunday',           ru: 'Пасха',                        type: 'Riigipüha' },
+        { date: `${year}-05-01`, et: 'Kevadpüha',                                         en: 'Spring Day',              ru: 'День весны',                   type: 'Riigipüha' },
+        { date: toDateStr(whitSunday),  et: 'Nelipühade 1. püha',                         en: 'Whit Sunday',             ru: 'День Святой Троицы',           type: 'Riigipüha' },
+        { date: `${year}-06-23`, et: 'Võidupüha',                                         en: 'Victory Day',             ru: 'День победы',                  type: 'Rahvuspüha' },
+        { date: `${year}-06-24`, et: 'Jaanipäev',                                         en: 'Midsummer Day',           ru: 'Иванов день',                  type: 'Riigipüha' },
+        { date: `${year}-08-20`, et: 'Taasiseseisvumispäev',                              en: 'Day of Restoration of Independence', ru: 'День восстановления независимости', type: 'Riigipüha' },
+        { date: `${year}-12-24`, et: 'Jõululaupäev',                                      en: 'Christmas Eve',           ru: 'Рождественский сочельник',     type: 'Riigipüha' },
+        { date: `${year}-12-25`, et: 'Esimene jõulupüha',                                 en: 'Christmas Day',           ru: 'Рождество',                    type: 'Riigipüha' },
+        { date: `${year}-12-26`, et: 'Teine jõulupüha',                                   en: 'Boxing Day',              ru: 'Второй день Рождества',        type: 'Riigipüha' },
+    ];
+
+    // Sort by date
+    holidays.sort((a, b) => a.date.localeCompare(b.date));
+
+    // Return in a shape compatible with the rest of the app
+    return holidays.map(h => ({
+        date: h.date,
+        localName: h.et,
+        name: h.en,
+        nameRu: h.ru,
+        types: [h.type],
+        global: true,
+    }));
+}
+
+// ── Estonian school holidays (official, from Haridus- ja Teadusministeerium) ─
 function getEstonianSchoolHolidays(year) {
     const schedule = {
         2024: [
