@@ -278,8 +278,8 @@ function displayCalendar(holidays, schoolHolidays, year) {
     const holidayDatesSet = new Set(holidays.map(h => h.date));
 
     const schoolRanges = (schoolHolidays || []).map(sh => ({
-        start: new Date(sh.startDate),
-        end: new Date(sh.endDate),
+        start: parseLocalDate(sh.startDate),
+        end: parseLocalDate(sh.endDate),
         name: sh.name.find(n => n.language === (currentLang === 'ru' ? 'RU' : 'EN'))?.text
             || sh.name[0]?.text || 'School Holiday'
     }));
@@ -376,7 +376,7 @@ function displayBridgeDays(holidays, year) {
 
 function findBridgeDays(holidays, year) {
     const suggestions = [];
-    const holidayDates = holidays.map(h => new Date(h.date));
+    const holidayDates = holidays.map(h => parseLocalDate(h.date));
     holidayDates.sort((a, b) => a - b);
 
     holidayDates.forEach(hd => {
@@ -417,8 +417,8 @@ function displaySchoolHolidays(schoolHolidays) {
     container.appendChild(h3);
 
     schoolHolidays.forEach(sh => {
-        const start = new Date(sh.startDate);
-        const end = new Date(sh.endDate);
+        const start = parseLocalDate(sh.startDate);
+        const end = parseLocalDate(sh.endDate);
         const duration = Math.ceil((end - start) / 86400000) + 1;
         const nameObj = sh.name.find(n => n.language === (currentLang === 'ru' ? 'RU' : 'EN')) || sh.name[0];
         const name = nameObj?.text || 'School Holiday';
@@ -543,7 +543,7 @@ function makeVacationRow(label, dates, days, workDays, typeClass, scrollStart, s
 
 // ── Vacation calculation ──────────────────────────────────────────────────────
 function calculateOptimalVacation(publicHolidays, schoolHolidays, year) {
-    const holidayDates = new Set(publicHolidays.map(h => new Date(h.date).getTime()));
+    const holidayDates = new Set(publicHolidays.map(h => parseLocalDate(h.date).getTime()));
     const mainVacation = findBest14DayPeriod(year, holidayDates);
     const winterWeek = findBestWinterWeek(year, holidayDates);
     const flexibleDays = findOptimalBridgeDays(year, holidayDates, mainVacation, winterWeek);
@@ -730,6 +730,12 @@ function addDays(date, days) {
     const d = new Date(date);
     d.setDate(d.getDate() + days);
     return d;
+}
+
+function parseLocalDate(str) {
+    // Parse YYYY-MM-DD as local time (not UTC) to avoid timezone shift
+    const [y, m, d] = str.split('-').map(Number);
+    return new Date(y, m - 1, d);
 }
 
 function toDateStr(date) {
