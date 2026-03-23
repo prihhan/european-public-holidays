@@ -354,6 +354,12 @@ function displayCalendar(holidays, schoolHolidays, year) {
             cell.className = 'day-cell';
             if (isWeekend(curDate)) cell.classList.add('weekend');
 
+            // Highlight today
+            const today = new Date();
+            if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                cell.classList.add('today');
+            }
+
             let tooltipText = null;
 
             const schoolRange = schoolRanges.find(r => curDate >= r.start && curDate <= r.end);
