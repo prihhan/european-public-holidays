@@ -3,34 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vacation Planner - European Holidays</title>
+    <title>Estonia Vacation Planner</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Vacation Planner</h1>
-        
-        <div class="controls">
-            <div class="custom-select-wrapper">
-                <div class="custom-select" id="customSelect">
-                    <div class="select-trigger">
-                        <span>Select a country...</span>
-                        <div class="arrow">▼</div>
-                    </div>
-                    <div class="options" id="countryOptions"></div>
-                </div>
+        <div class="top-bar">
+            <div class="flag-title">
+                <img src="https://flagcdn.com/w80/ee.png" alt="Estonia" class="country-flag">
+                <h1 data-i18n="title">Estonia Vacation Planner</h1>
             </div>
-            <input type="number" id="yearInput" min="2020" max="2030" placeholder="Year">
-            <button id="loadBtn">Load Holidays</button>
+            <div class="top-controls">
+                <div class="lang-toggle">
+                    <button id="langEN" class="lang-btn active" onclick="setLang('en')">EN</button>
+                    <button id="langRU" class="lang-btn" onclick="setLang('ru')">RU</button>
+                </div>
+                <div class="year-toggle">
+                    <button id="yearCurrent" class="year-btn active" onclick="setYear('current')"></button>
+                    <button id="yearNext" class="year-btn" onclick="setYear('next')"></button>
+                </div>
+                <button id="loadBtn" class="load-btn" data-i18n="load">Load</button>
+            </div>
         </div>
 
-        <div id="loading" class="loading hidden">Loading...</div>
+        <div id="loading" class="loading hidden" data-i18n="loading">Loading...</div>
         <div id="error" class="error hidden"></div>
 
         <div id="bridgeDays" class="bridge-days"></div>
         <div id="schoolHolidays" class="school-holidays"></div>
         <div id="vacationPlanner" class="vacation-planner"></div>
-
         <div id="results" class="results"></div>
         <div id="calendar" class="calendar"></div>
     </div>
