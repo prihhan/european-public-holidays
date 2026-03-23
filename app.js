@@ -348,6 +348,7 @@ function displayCalendar(holidays, schoolHolidays, year) {
             const curDate = new Date(year, month, day);
             const cell = document.createElement('div');
             cell.className = 'day-cell';
+            if (isWeekend(curDate)) cell.classList.add('weekend');
 
             let tooltipText = null;
 

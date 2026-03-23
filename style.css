@@ -615,37 +615,56 @@ h1 {
 
 .calendar {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-}
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
 }
 
 .month {
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 15px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+    transition: box-shadow 0.2s ease;
+}
+
+.month:hover {
+    box-shadow: 0 4px 18px rgba(102,126,234,0.18);
 }
 
 .month-header {
     font-weight: 700;
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 10px;
+    font-size: 15px;
+    color: #fff;
     text-align: center;
+    padding: 10px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .days-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+    gap: 3px;
+    padding: 10px;
+    background: #fff;
 }
 
 .day-header {
-    font-size: 12px;
-    font-weight: 600;
-    color: #666;
+    font-size: 11px;
+    font-weight: 700;
+    color: #999;
     text-align: center;
-    padding: 5px;
+    padding: 4px 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Saturday and Sunday headers */
+.day-header:nth-child(6),
+.day-header:nth-child(7) {
+    color: #c0392b;
 }
 
 .day-cell {
@@ -653,10 +672,23 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: white;
-    border-radius: 4px;
-    font-size: 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
     cursor: default;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Weekends colored in JS via .weekend class */
+.day-cell.weekend:not(.holiday):not(.school-holiday) {
+    color: #c0392b;
+    background: #fff5f5;
+}
+
+/* Saturday and Sunday headers (last 2 of 7) */
+.day-header:nth-child(6),
+.day-header:nth-child(7) {
+    color: #c0392b;
 }
 
 .day-cell.empty {
@@ -665,40 +697,40 @@ h1 {
 
 .day-cell.holiday {
     background: #dc3545;
-    color: white;
+    color: white !important;
     font-weight: 700;
     cursor: help;
+    box-shadow: 0 1px 4px rgba(220,53,69,0.4);
 }
 
 .day-cell.holiday.shortened {
     background: #ffc107;
-    color: #333;
+    color: #333 !important;
+    box-shadow: 0 1px 4px rgba(255,193,7,0.4);
 }
 
 .day-cell.holiday:hover {
-    background: #c82333;
-    transform: scale(1.1);
-    transition: all 0.2s;
+    transform: scale(1.15);
+    box-shadow: 0 3px 10px rgba(220,53,69,0.5);
 }
 
 .day-cell.holiday.shortened:hover {
-    background: #e0a800;
+    transform: scale(1.15);
+    box-shadow: 0 3px 10px rgba(255,193,7,0.5);
 }
-
 
 .day-cell.school-holiday {
     background: #ffe066;
-    color: #333;
+    color: #7a6000 !important;
     font-weight: 600;
     cursor: help;
 }
 
 .day-cell.school-holiday:hover {
     background: #ffd700;
-    transform: scale(1.1);
-    transition: all 0.2s;
+    transform: scale(1.15);
+    box-shadow: 0 3px 10px rgba(255,215,0,0.5);
 }
-
 
 .day-cell.highlight {
     animation: highlight-pulse 1s ease-in-out 3;
