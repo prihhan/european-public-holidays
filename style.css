@@ -152,27 +152,50 @@ h1 {
     gap: 10px;
     padding: 12px 16px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-size: 200% 200%;
     color: white;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 700;
     font-size: 16px;
     user-select: none;
-    transition: opacity 0.2s;
+    transition: box-shadow 0.25s ease, transform 0.2s ease, background-position 0.4s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .collapsible-header:hover {
-    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    background-position: right center;
+}
+
+.collapsible-header:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .collapsible-icon {
     font-size: 12px;
     width: 16px;
     flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.collapsible-header.is-open .collapsible-icon {
+    transform: rotate(90deg);
 }
 
 .collapsible-body {
     margin-top: 8px;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+    opacity: 0;
+}
+
+.collapsible-body.is-open {
+    max-height: 5000px;
+    opacity: 1;
 }
 
 .loading, .error {

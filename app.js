@@ -355,7 +355,7 @@ function makeCollapsible(containerEl, titleText, startCollapsed = false) {
 
     const icon = document.createElement('span');
     icon.className = 'collapsible-icon';
-    icon.textContent = startCollapsed ? '▶' : '▼';
+    icon.textContent = '▶';
 
     const title = document.createElement('span');
     title.textContent = titleText;
@@ -365,15 +365,17 @@ function makeCollapsible(containerEl, titleText, startCollapsed = false) {
 
     const body = document.createElement('div');
     body.className = 'collapsible-body';
-    body.style.display = startCollapsed ? 'none' : 'block';
-
-    // Move containerEl into body
     body.appendChild(containerEl);
 
+    if (!startCollapsed) {
+        header.classList.add('is-open');
+        body.classList.add('is-open');
+    }
+
     header.addEventListener('click', () => {
-        const collapsed = body.style.display === 'none';
-        body.style.display = collapsed ? 'block' : 'none';
-        icon.textContent = collapsed ? '▼' : '▶';
+        const opening = !body.classList.contains('is-open');
+        body.classList.toggle('is-open', opening);
+        header.classList.toggle('is-open', opening);
     });
 
     wrapper.appendChild(header);
