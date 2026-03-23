@@ -2,7 +2,7 @@
 // v1.4 - fix school holiday calendar coloring
 const TRANSLATIONS = {
     en: {
-        title: 'Estonia Vacation Planner',
+        title: 'Vacation Planner',
         loading: 'Loading...',
         publicHolidays: 'Public Holidays',
         schoolHolidays: '🎒 School Holidays',
@@ -97,6 +97,25 @@ function setYear(which) {
     document.getElementById('yearNext').classList.toggle('active', which === 'next');
     loadHolidays();
 }
+
+// ── Shared calendar tooltip (created once) ────────────────────────────────
+const calTooltip = document.createElement('div');
+calTooltip.className = 'cal-tooltip';
+document.body.appendChild(calTooltip);
+
+function showCalTooltip(e, text) {
+    calTooltip.textContent = text;
+    calTooltip.classList.add('visible');
+    moveCalTooltip(e);
+}
+function moveCalTooltip(e) {
+    const x = e.clientX + 14;
+    const y = e.clientY - 40;
+    const maxX = window.innerWidth - calTooltip.offsetWidth - 8;
+    calTooltip.style.left = Math.min(x, maxX) + 'px';
+    calTooltip.style.top = Math.max(y, 8) + 'px';
+}
+function hideCalTooltip() { calTooltip.classList.remove('visible'); }
 
 // ── DOM refs ─────────────────────────────────────────────────────────────────
 const loading = document.getElementById('loading');
@@ -306,25 +325,6 @@ function displayCalendar(holidays, schoolHolidays, year) {
     const months = t('months');
     const dayNames = t('days');
 
-    // Shared tooltip element
-    const tooltip = document.createElement('div');
-    tooltip.className = 'cal-tooltip';
-    document.body.appendChild(tooltip);
-
-    function showTooltip(e, text) {
-        tooltip.textContent = text;
-        tooltip.classList.add('visible');
-        positionTooltip(e);
-    }
-    function positionTooltip(e) {
-        const x = e.clientX + 12;
-        const y = e.clientY - 36;
-        const maxX = window.innerWidth - tooltip.offsetWidth - 8;
-        tooltip.style.left = Math.min(x, maxX) + 'px';
-        tooltip.style.top = Math.max(y, 8) + 'px';
-    }
-    function hideTooltip() { tooltip.classList.remove('visible'); }
-
     for (let month = 0; month < 12; month++) {
         const monthDiv = document.createElement('div');
         monthDiv.className = 'month';
@@ -381,9 +381,9 @@ function displayCalendar(holidays, schoolHolidays, year) {
             }
 
             if (tooltipText) {
-                cell.addEventListener('mouseenter', e => showTooltip(e, tooltipText));
-                cell.addEventListener('mousemove', positionTooltip);
-                cell.addEventListener('mouseleave', hideTooltip);
+                cell.addEventListener('mouseenter', e => showCalTooltip(e, tooltipText));
+                cell.addEventListener('mousemove', moveCalTooltip);
+                cell.addEventListener('mouseleave', hideCalTooltip);
             }
 
             cell.textContent = day;
