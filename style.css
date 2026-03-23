@@ -9,6 +9,23 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><g fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"><path d="M150,50 L180,45 L200,50 L220,55 L240,60 L260,70 L280,80 L300,85 L320,88 L340,90 L360,92 L380,95 L400,100 L420,105 L440,110 L460,115 L480,120 L500,125 L520,130 L540,135 L560,140 L580,145 L600,150 L620,155 L640,160 L660,165 L680,170 L700,175 L720,180 L740,185 L750,190 L755,200 L758,210 L760,220 L760,230 L758,240 L755,250 L750,260 L740,270 L720,280 L700,290 L680,300 L660,310 L640,320 L620,330 L600,340 L580,350 L560,360 L540,370 L520,380 L500,390 L480,400 L460,410 L440,420 L420,430 L400,440 L380,450 L360,460 L340,470 L320,480 L300,490 L280,500 L260,510 L240,520 L220,530 L200,540 L180,545 L160,548 L140,550 L120,548 L100,545 L80,540 L60,530 L40,520 L20,510 L10,500 L5,490 L2,480 L2,470 L5,460 L10,450 L20,440 L40,430 L60,420 L80,410 L100,400 L120,390 L140,380 L160,370 L180,360 L200,350 L220,340 L240,330 L260,320 L280,310 L300,300 L320,290 L340,280 L360,270 L380,260 L400,250 L420,240 L440,230 L460,220 L480,210 L500,200 L520,190 L540,180 L560,170 L580,160 L600,150 L620,140 L640,130 L660,120 L680,110 L700,100 L720,90 L740,80 L750,70 L755,60 L758,50 L760,40 L758,30 L755,20 L750,15 L740,10 L720,8 L700,6 L680,5 L660,5 L640,6 L620,8 L600,10 L580,12 L560,15 L540,18 L520,22 L500,26 L480,30 L460,35 L440,40 L420,42 L400,44 L380,45 L360,46 L340,47 L320,48 L300,48 L280,47 L260,46 L240,44 L220,42 L200,40 L180,38 L160,36 L140,35 L120,35 L100,36 L80,38 L60,40 L40,43 L20,46 L10,50 Z"/><path d="M400,100 L420,95 L440,92 L460,90 L480,88 L500,87 L520,86 L540,86 L560,87 L580,88 L600,90 L620,92 L640,95 L660,98 L680,102 L700,106 L720,110 L740,115 L760,120 L780,125 L790,130 L795,135 L798,140 L798,145 L795,150 L790,155 L780,160 L760,165 L740,170 L720,175 L700,180 L680,185 L660,190 L640,195 L620,200 L600,205 L580,210 L560,215 L540,220 L520,225 L500,230 L480,235 L460,240 L440,245 L420,250 L400,255 L380,260 L360,265 L340,270 L320,275 L300,280 L280,285 L260,290 L240,295 L220,300 L200,305 L180,310 L160,315 L140,320 L120,325 L100,330 L80,335 L60,340 L40,345 L20,350 L10,355 L5,360 L2,365 L2,370 L5,375 L10,380 L20,385 L40,390 L60,395 L80,400 L100,405 L120,410 L140,415 L160,420 L180,425 L200,430 L220,435 L240,440 L260,445 L280,450 L300,455 L320,460 L340,465 L360,470 L380,475 L400,480 L420,485 L440,490 L460,495 L480,500 L500,505 L520,510 L540,515 L560,520 L580,525 L600,530 L620,535 L640,540 L660,545 L680,550 L700,555 L720,560 L740,565 L760,570 L780,575 L790,580 L795,585 L798,590 L798,595 L795,600 L790,605 L780,610 L760,615 L740,620 L720,625 L700,630 L680,635 L660,640 L640,645 L620,650 L600,655 L580,660 L560,665 L540,670 L520,675 L500,680 L480,685 L460,690 L440,695 L420,700 L400,705 L380,710 L360,715 L340,720 L320,725 L300,730 L280,735 L260,740 L240,745 L220,750 L200,755 L180,760 L160,765 L140,770 L120,775 L100,780 L80,785 L60,790 L40,795 L20,798 L10,798 L5,795 L2,790 L2,785 L5,780 L10,775 L20,770 L40,765 L60,760 L80,755 L100,750 L120,745 L140,740 L160,735 L180,730 L200,725 L220,720 L240,715 L260,710 L280,705 L300,700 L320,695 L340,690 L360,685 L380,680 L400,675 L420,670 L440,665 L460,660 L480,655 L500,650 L520,645 L540,640 L560,635 L580,630 L600,625 L620,620 L640,615 L660,610 L680,605 L700,600 L720,595 L740,590 L760,585 L780,580 L790,575 L795,570 L798,565 L798,560 L795,555 L790,550 L780,545 L760,540 L740,535 L720,530 L700,525 L680,520 L660,515 L640,510 L620,505 L600,500 L580,495 L560,490 L540,485 L520,480 L500,475 L480,470 L460,465 L440,460 L420,455 L400,450 L380,445 L360,440 L340,435 L320,430 L300,425 L280,420 L260,415 L240,410 L220,405 L200,400 L180,395 L160,390 L140,385 L120,380 L100,375 L80,370 L60,365 L40,360 L20,355 L10,350 L5,345 L2,340 L2,335 L5,330 L10,325 L20,320 L40,315 L60,310 L80,305 L100,300 L120,295 L140,290 L160,285 L180,280 L200,275 L220,270 L240,265 L260,260 L280,255 L300,250 L320,245 L340,240 L360,235 L380,230 L400,225 L420,220 L440,215 L460,210 L480,205 L500,200 L520,195 L540,190 L560,185 L580,180 L600,175 L620,170 L640,165 L660,160 L680,155 L700,150 L720,145 L740,140 L760,135 L780,130 L790,125 L795,120 L798,115 L798,110 L795,105 L790,102 L780,100 Z"/></g></svg>');
+    background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .container {
@@ -18,6 +35,8 @@ body {
     border-radius: 12px;
     padding: 30px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 1;
 }
 
 h1 {
@@ -59,6 +78,12 @@ h1 {
 
 .select-trigger:hover {
     border-color: #667eea;
+}
+
+.select-trigger:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .select-trigger .arrow {
@@ -279,6 +304,133 @@ button:hover {
     font-size: 14px;
 }
 
+.vacation-planner {
+    margin-bottom: 30px;
+}
+
+.vacation-planner-container {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+.vacation-planner-container h3 {
+    color: white;
+    margin: 0 0 15px 0;
+}
+
+.vacation-plan-table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.vacation-plan-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vacation-plan-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    gap: 10px;
+}
+
+.vacation-plan-row:last-child {
+    border-bottom: none;
+}
+
+.vacation-plan-row:hover {
+    background: #f8f9fa;
+}
+
+.vacation-plan-label {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 14px;
+}
+
+.vacation-plan-dates {
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+    color: #667eea;
+    transition: color 0.2s;
+}
+
+.vacation-plan-dates:hover {
+    color: #5568d3;
+}
+
+.vacation-plan-days {
+    color: #666;
+    font-size: 13px;
+    text-align: center;
+}
+
+.vacation-plan-type {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.type-main {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.type-winter {
+    background: #e8f5e9;
+    color: #388e3c;
+    border: 1px solid #4caf50;
+}
+
+.type-flexible {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.vacation-summary {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.summary-item {
+    text-align: center;
+}
+
+.summary-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #667eea;
+    display: block;
+}
+
+.summary-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
 .results {
     display: block;
 }
@@ -464,4 +616,23 @@ button:hover {
     background: #ff99cc;
     transform: scale(1.1);
     transition: all 0.2s;
+}
+
+
+.day-cell.highlight {
+    animation: highlight-pulse 1s ease-in-out 3;
+    box-shadow: 0 0 0 3px #ffd700 !important;
+    z-index: 10;
+    position: relative;
+}
+
+@keyframes highlight-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 3px #ffd700;
+    }
+    50% {
+        transform: scale(1.15);
+        box-shadow: 0 0 0 6px #ffd700;
+    }
 }

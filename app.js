@@ -42,11 +42,14 @@ const selectTrigger = customSelect.querySelector('.select-trigger');
 const countryOptions = document.getElementById('countryOptions');
 const bridgeDays = document.getElementById('bridgeDays');
 const schoolHolidaysSection = document.getElementById('schoolHolidays');
+const vacationPlannerSection = document.getElementById('vacationPlanner');
 
 let currentHolidays = [];
 let currentCountryCode = '';
 let currentYear = '';
 let selectedCountry = null;
+let searchTimeout = null;
+let searchQuery = '';
 
 // Populate custom dropdown
 europeanCountries.forEach(country => {
@@ -100,6 +103,92 @@ selectTrigger.addEventListener('click', (e) => {
 document.addEventListener('click', () => {
     customSelect.classList.remove('open');
 });
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    // Only handle keyboard when dropdown is open or focused
+    if (!customSelect.classList.contains('open') && document.activeElement !== selectTrigger) {
+        return;
+    }
+
+    const key = e.key.toLowerCase();
+    
+    // Open dropdown on Enter or Space when trigger is focused
+    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement === selectTrigger) {
+        e.preventDefault();
+        customSelect.classList.toggle('open');
+        return;
+    }
+
+    // Close on Escape
+    if (e.key === 'Escape') {
+        customSelect.classList.remove('open');
+        return;
+    }
+
+    // Type-ahead search
+    if (key.length === 1 && key.match(/[a-z]/i)) {
+        e.preventDefault();
+        
+        // Clear previous timeout
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+        
+        // Add to search query
+        searchQuery += key;
+        
+        // Find matching country
+        const matchingCountry = europeanCountries.find(country => 
+            country.name.toLowerCase().startsWith(searchQuery)
+        );
+        
+        if (matchingCountry) {
+            // Highlight the matching option
+            const options = countryOptions.querySelectorAll('.option');
+            options.forEach(opt => {
+                if (opt.getAttribute('data-value') === matchingCountry.code) {
+                    opt.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    opt.style.background = '#e3f2fd';
+                    setTimeout(() => {
+                        opt.style.background = '';
+                    }, 500);
+                }
+            });
+        }
+        
+        // Reset search query after 1 second
+        searchTimeout = setTimeout(() => {
+            searchQuery = '';
+        }, 1000);
+    }
+
+    // Arrow navigation
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        
+        if (!customSelect.classList.contains('open')) {
+            customSelect.classList.add('open');
+            return;
+        }
+
+        const options = Array.from(countryOptions.querySelectorAll('.option'));
+        const selectedOption = countryOptions.querySelector('.option.selected');
+        let currentIndex = selectedOption ? options.indexOf(selectedOption) : -1;
+        
+        if (e.key === 'ArrowDown') {
+            currentIndex = (currentIndex + 1) % options.length;
+        } else {
+            currentIndex = currentIndex <= 0 ? options.length - 1 : currentIndex - 1;
+        }
+        
+        options[currentIndex].click();
+        options[currentIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+});
+
+// Make trigger focusable
+selectTrigger.setAttribute('tabindex', '0');
 
 // Set current year as default
 yearInput.value = new Date().getFullYear();
@@ -156,6 +245,7 @@ async function loadHolidays() {
         displayCalendar(publicHolidays, schoolHolidays, year);
         displayBridgeDays(publicHolidays, year);
         displaySchoolHolidays(schoolHolidays, year);
+        displayVacationPlanner(publicHolidays, schoolHolidays, year);
     } catch (err) {
         hideLoading();
         showError('Failed to load holidays. Please try again.');
@@ -563,3 +653,666 @@ function displayCalendar(holidays, schoolHolidays, year) {
     }
 }
 
+
+
+function displayVacationPlanner(publicHolidays, schoolHolidays, year) {
+    vacationPlannerSection.innerHTML = '';
+    
+    const plan = calculateOptimalVacation(publicHolidays, schoolHolidays, year);
+    
+    if (!plan) {
+        return;
+    }
+
+    const container = document.createElement('div');
+    container.className = 'vacation-planner-container';
+    
+    const header = document.createElement('h3');
+    header.textContent = '🏖️ Optimal Vacation Plan (28 + 7 Days)';
+    container.appendChild(header);
+    
+    const note = document.createElement('p');
+    note.style.color = 'white';
+    note.style.fontSize = '14px';
+    note.style.marginBottom = '15px';
+    note.style.fontStyle = 'italic';
+    note.textContent = '💡 Note: Weekends and public holidays are not counted as vacation days (except for the 14 consecutive main vacation)';
+    container.appendChild(note);
+
+    const table = document.createElement('div');
+    table.className = 'vacation-plan-table';
+    
+    const tableHeader = document.createElement('div');
+    tableHeader.className = 'vacation-plan-header';
+    tableHeader.innerHTML = '📅 Recommended Vacation Schedule';
+    table.appendChild(tableHeader);
+
+    const mainRow = document.createElement('div');
+    mainRow.className = 'vacation-plan-row';
+    mainRow.innerHTML = `
+        <div class="vacation-plan-label">Main Vacation</div>
+        <div class="vacation-plan-dates" data-start="${plan.mainVacation.start.toISOString()}" data-end="${plan.mainVacation.end.toISOString()}">${formatDateRange(plan.mainVacation.start, plan.mainVacation.end)}</div>
+        <div class="vacation-plan-days">${plan.mainVacation.totalDays} total days</div>
+        <div class="vacation-plan-type type-main">${plan.mainWorkDays} work days</div>
+    `;
+    
+    // Add click handler
+    const mainDates = mainRow.querySelector('.vacation-plan-dates');
+    mainDates.addEventListener('click', () => {
+        scrollToCalendarDate(plan.mainVacation.start, plan.mainVacation.end);
+    });
+    
+    table.appendChild(mainRow);
+
+    const winterRow = document.createElement('div');
+    winterRow.className = 'vacation-plan-row';
+    const winterStartDay = plan.winterWeek.start.toLocaleDateString('en-US', { weekday: 'short' });
+    const winterEndDay = plan.winterWeek.end.toLocaleDateString('en-US', { weekday: 'short' });
+    winterRow.innerHTML = `
+        <div class="vacation-plan-label">Winter Week</div>
+        <div class="vacation-plan-dates" data-start="${plan.winterWeek.start.toISOString()}" data-end="${plan.winterWeek.end.toISOString()}">${formatDateRange(plan.winterWeek.start, plan.winterWeek.end)} (${winterStartDay}-${winterEndDay})</div>
+        <div class="vacation-plan-days">${plan.winterWeek.totalDays} total days</div>
+        <div class="vacation-plan-type type-winter">${plan.winterWorkDays} work days</div>
+    `;
+    
+    // Add click handler
+    const winterDates = winterRow.querySelector('.vacation-plan-dates');
+    winterDates.addEventListener('click', () => {
+        scrollToCalendarDate(plan.winterWeek.start, plan.winterWeek.end);
+    });
+    
+    table.appendChild(winterRow);
+
+    plan.flexibleDays.forEach((period, index) => {
+        const flexRow = document.createElement('div');
+        flexRow.className = 'vacation-plan-row';
+        const efficiency = Math.round((period.totalDays / period.workDays) * 10) / 10;
+        
+        // Show the vacation days being taken
+        const vacationDaysText = period.workDays === 1 ? 
+            `Take ${formatDate(period.start)} off` : 
+            `Take ${formatDateRange(period.start, period.end)} off`;
+        
+        flexRow.innerHTML = `
+            <div class="vacation-plan-label">Bridge ${index + 1}</div>
+            <div class="vacation-plan-dates" data-start="${period.breakStart ? period.breakStart.toISOString() : period.start.toISOString()}" data-end="${period.breakEnd ? period.breakEnd.toISOString() : period.end.toISOString()}">${vacationDaysText}</div>
+            <div class="vacation-plan-days">${period.totalDays}-day break</div>
+            <div class="vacation-plan-type type-flexible">${period.workDays} work day${period.workDays > 1 ? 's' : ''}</div>
+        `;
+        
+        // Add click handler - scroll to the full break period
+        const flexDates = flexRow.querySelector('.vacation-plan-dates');
+        flexDates.addEventListener('click', () => {
+            const scrollStart = period.breakStart || period.start;
+            const scrollEnd = period.breakEnd || period.end;
+            scrollToCalendarDate(scrollStart, scrollEnd);
+        });
+        
+        table.appendChild(flexRow);
+    });
+
+    container.appendChild(table);
+
+    const summary = document.createElement('div');
+    summary.className = 'vacation-summary';
+    const daysSaved = 35 - plan.totalVacationDays;
+    summary.innerHTML = `
+        <div class="summary-item">
+            <span class="summary-value">${plan.totalVacationDays}</span>
+            <span class="summary-label">Work Days Used</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-value">${plan.totalCalendarDays}</span>
+            <span class="summary-label">Total Days Off</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-value">${daysSaved}</span>
+            <span class="summary-label">Days Saved</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-value">${plan.efficiency}%</span>
+            <span class="summary-label">Efficiency</span>
+        </div>
+    `;
+    container.appendChild(summary);
+
+    vacationPlannerSection.appendChild(container);
+}
+
+function calculateOptimalVacation(publicHolidays, schoolHolidays, year) {
+    const holidayDates = new Set(publicHolidays.map(h => new Date(h.date).getTime()));
+    
+    // Find optimal 14-day consecutive block (prefer summer)
+    const mainVacation = findBest14DayPeriod(year, holidayDates, schoolHolidays);
+    
+    // Find optimal winter week (Monday-Sunday)
+    const winterWeek = findBestWinterWeek(year, holidayDates);
+    
+    // Find optimal bridge days with remaining 14 days
+    const flexibleDays = findOptimalBridgeDays(year, holidayDates, mainVacation, winterWeek);
+    
+    const regularVacationDays = 28; // Regular vacation days
+    const winterVacationDays = 7;   // Additional winter vacation days
+    
+    // Calculate work days used (excluding weekends and public holidays)
+    const mainWorkDays = countWorkDays(mainVacation.start, mainVacation.end, holidayDates);
+    const winterWorkDays = countWorkDays(winterWeek.start, winterWeek.end, holidayDates);
+    const flexibleWorkDays = flexibleDays.reduce((sum, period) => 
+        sum + period.workDays, 0);
+    
+    const totalWorkDaysUsed = mainWorkDays + winterWorkDays + flexibleWorkDays;
+    
+    const totalCalendarDays = mainVacation.totalDays + winterWeek.totalDays + 
+        flexibleDays.reduce((sum, p) => sum + p.totalDays, 0);
+    const efficiency = Math.round((totalCalendarDays / totalWorkDaysUsed) * 100);
+    
+    return {
+        mainVacation,
+        winterWeek,
+        flexibleDays,
+        totalVacationDays: totalWorkDaysUsed,
+        totalCalendarDays,
+        publicHolidaysUsed: (mainWorkDays + winterWorkDays + flexibleWorkDays) - (regularVacationDays + winterVacationDays),
+        efficiency,
+        mainWorkDays,
+        winterWorkDays,
+        flexibleWorkDays
+    };
+}
+
+function findBest14DayPeriod(year, holidayDates, schoolHolidays) {
+    let bestPeriod = null;
+    let maxScore = -1;
+    
+    // Prefer summer months (June, July, August)
+    const monthRanges = [
+        { start: 5, end: 7, priority: 3 },  // Jun-Aug (highest priority)
+        { start: 4, end: 8, priority: 2 },  // May-Sep
+        { start: 3, end: 9, priority: 1 }   // Apr-Oct
+    ];
+    
+    for (const range of monthRanges) {
+        for (let month = range.start; month <= range.end; month++) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let day = 1; day <= daysInMonth - 13; day++) {
+                const start = new Date(year, month, day);
+                const end = new Date(start);
+                end.setDate(end.getDate() + 13);
+                
+                // Count work days needed
+                const workDays = countWorkDays(start, end, holidayDates);
+                
+                // Count public holidays in this period
+                const holidaysInPeriod = countHolidaysInPeriod(start, end, holidayDates);
+                
+                // Count weekends
+                const weekendsInPeriod = countWeekendsInPeriod(start, end);
+                
+                // Score: minimize work days, maximize holidays and weekends
+                // Higher priority for summer months
+                const score = (holidaysInPeriod * 3 + weekendsInPeriod * 2 - workDays) * range.priority;
+                
+                if (score > maxScore && workDays <= 14) {
+                    maxScore = score;
+                    bestPeriod = { 
+                        start: new Date(start), 
+                        end: new Date(end), 
+                        totalDays: 14,
+                        workDays,
+                        holidaysInPeriod,
+                        weekendsInPeriod
+                    };
+                }
+            }
+        }
+    }
+    
+    return bestPeriod || { 
+        start: new Date(year, 6, 1), 
+        end: new Date(year, 6, 14), 
+        totalDays: 14,
+        workDays: 10,
+        holidaysInPeriod: 0,
+        weekendsInPeriod: 4
+    };
+}
+
+function findBestWinterWeek(year, holidayDates) {
+    let bestWeek = null;
+    let maxScore = -1;
+    
+    // Check December, January, February
+    const periods = [
+        { month: 11, year: year },      // December
+        { month: 0, year: year + 1 },   // January
+        { month: 1, year: year + 1 }    // February
+    ];
+    
+    periods.forEach(({ month, year: checkYear }) => {
+        const daysInMonth = new Date(checkYear, month + 1, 0).getDate();
+        
+        for (let day = 1; day <= daysInMonth - 6; day++) {
+            const date = new Date(checkYear, month, day);
+            
+            // Find Monday of this week
+            const dayOfWeek = date.getDay();
+            const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            const monday = new Date(date);
+            monday.setDate(monday.getDate() + daysToMonday);
+            
+            // Week is Monday to Sunday (7 consecutive days)
+            const sunday = new Date(monday);
+            sunday.setDate(sunday.getDate() + 6);
+            
+            const workDays = countWorkDays(monday, sunday, holidayDates);
+            const holidaysInWeek = countHolidaysInPeriod(monday, sunday, holidayDates);
+            
+            // Score: minimize work days, maximize holidays
+            const score = holidaysInWeek * 5 - workDays;
+            
+            if (score > maxScore) {
+                maxScore = score;
+                bestWeek = { 
+                    start: new Date(monday), 
+                    end: new Date(sunday), 
+                    totalDays: 7, 
+                    workDays,
+                    holidaysInWeek
+                };
+            }
+        }
+    });
+    
+    if (!bestWeek) {
+        const christmas = new Date(year, 11, 25);
+        const dayOfWeek = christmas.getDay();
+        const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        const monday = new Date(christmas);
+        monday.setDate(monday.getDate() + daysToMonday);
+        const sunday = new Date(monday);
+        sunday.setDate(sunday.getDate() + 6);
+        
+        bestWeek = {
+            start: monday,
+            end: sunday,
+            totalDays: 7,
+            workDays: countWorkDays(monday, sunday, holidayDates),
+            holidaysInWeek: countHolidaysInPeriod(monday, sunday, holidayDates)
+        };
+    }
+    
+    return bestWeek;
+}
+
+function findOptimalBridgeDays(year, holidayDates, mainVacation, winterWeek) {
+    const flexible = [];
+    const remainingDays = 14; // 14 flexible days from the 28 regular vacation days
+    
+    const holidays = Array.from(holidayDates).map(ts => new Date(ts)).sort((a, b) => a - b);
+    
+    // Find all bridge opportunities
+    const bridgeOpportunities = [];
+    
+    holidays.forEach(holiday => {
+        const dayOfWeek = holiday.getDay();
+        
+        // Skip if holiday is in main vacation or winter week period
+        if (isInPeriod(holiday, mainVacation) || isInPeriod(holiday, winterWeek)) {
+            return;
+        }
+        
+        // Thursday holiday - take Friday for 4-day weekend
+        if (dayOfWeek === 4) {
+            const friday = new Date(holiday);
+            friday.setDate(friday.getDate() + 1);
+            const sunday = new Date(friday);
+            sunday.setDate(sunday.getDate() + 2);
+            
+            if (!isWeekend(friday) && !holidayDates.has(friday.getTime()) &&
+                !isInPeriod(friday, mainVacation) && !isInPeriod(friday, winterWeek)) {
+                bridgeOpportunities.push({
+                    start: friday,
+                    end: friday,
+                    breakStart: holiday,
+                    breakEnd: sunday,
+                    totalDays: 4,
+                    workDays: 1,
+                    score: 4.0,
+                    description: 'Thu holiday + Fri off = 4-day weekend'
+                });
+            }
+        }
+        
+        // Tuesday holiday - take Monday for 4-day weekend
+        if (dayOfWeek === 2) {
+            const monday = new Date(holiday);
+            monday.setDate(monday.getDate() - 1);
+            const saturday = new Date(monday);
+            saturday.setDate(saturday.getDate() - 1);
+            
+            if (!isWeekend(monday) && !holidayDates.has(monday.getTime()) &&
+                !isInPeriod(monday, mainVacation) && !isInPeriod(monday, winterWeek)) {
+                bridgeOpportunities.push({
+                    start: monday,
+                    end: monday,
+                    breakStart: saturday,
+                    breakEnd: holiday,
+                    totalDays: 4,
+                    workDays: 1,
+                    score: 4.0,
+                    description: 'Mon off + Tue holiday = 4-day weekend'
+                });
+            }
+        }
+        
+        // Friday holiday - take Thursday for 4-day weekend
+        if (dayOfWeek === 5) {
+            const thursday = new Date(holiday);
+            thursday.setDate(thursday.getDate() - 1);
+            const sunday = new Date(holiday);
+            sunday.setDate(sunday.getDate() + 2);
+            
+            if (!isWeekend(thursday) && !holidayDates.has(thursday.getTime()) &&
+                !isInPeriod(thursday, mainVacation) && !isInPeriod(thursday, winterWeek)) {
+                bridgeOpportunities.push({
+                    start: thursday,
+                    end: thursday,
+                    breakStart: thursday,
+                    breakEnd: sunday,
+                    totalDays: 4,
+                    workDays: 1,
+                    score: 4.0,
+                    description: 'Thu off + Fri holiday = 4-day weekend'
+                });
+            }
+        }
+        
+        // Monday holiday - take Friday before for 4-day weekend
+        if (dayOfWeek === 1) {
+            const friday = new Date(holiday);
+            friday.setDate(friday.getDate() - 3);
+            const sunday = new Date(holiday);
+            sunday.setDate(sunday.getDate() + 0);
+            
+            if (!isWeekend(friday) && !holidayDates.has(friday.getTime()) &&
+                !isInPeriod(friday, mainVacation) && !isInPeriod(friday, winterWeek)) {
+                bridgeOpportunities.push({
+                    start: friday,
+                    end: friday,
+                    breakStart: friday,
+                    breakEnd: holiday,
+                    totalDays: 4,
+                    workDays: 1,
+                    score: 4.0,
+                    description: 'Fri off + Mon holiday = 4-day weekend'
+                });
+            }
+        }
+        
+        // Look for consecutive or near-consecutive holidays
+        for (let i = 1; i <= 4; i++) {
+            const futureDate = new Date(holiday);
+            futureDate.setDate(futureDate.getDate() + i);
+            
+            if (holidayDates.has(futureDate.getTime())) {
+                // Found another holiday within 4 days
+                const gapDays = [];
+                for (let j = 1; j < i; j++) {
+                    const gapDay = new Date(holiday);
+                    gapDay.setDate(gapDay.getDate() + j);
+                    if (!isWeekend(gapDay) && !holidayDates.has(gapDay.getTime())) {
+                        gapDays.push(gapDay);
+                    }
+                }
+                
+                if (gapDays.length > 0 && gapDays.length <= 3) {
+                    // Calculate full break period
+                    let breakStart = new Date(holiday);
+                    let breakEnd = new Date(futureDate);
+                    
+                    // Extend to weekends
+                    while (breakStart.getDay() !== 1 && breakStart.getDay() !== 0) {
+                        const prev = new Date(breakStart);
+                        prev.setDate(prev.getDate() - 1);
+                        if (isWeekend(prev) || holidayDates.has(prev.getTime())) {
+                            breakStart = prev;
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    while (breakEnd.getDay() !== 0 && breakEnd.getDay() !== 6) {
+                        const next = new Date(breakEnd);
+                        next.setDate(next.getDate() + 1);
+                        if (isWeekend(next) || holidayDates.has(next.getTime())) {
+                            breakEnd = next;
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    const totalDays = Math.round((breakEnd - breakStart) / (1000 * 60 * 60 * 24)) + 1;
+                    const workDays = gapDays.length;
+                    
+                    if (totalDays >= 5 && workDays <= 3) {
+                        const allInRange = gapDays.every(d => 
+                            !isInPeriod(d, mainVacation) && !isInPeriod(d, winterWeek)
+                        );
+                        
+                        if (allInRange) {
+                            bridgeOpportunities.push({
+                                start: gapDays[0],
+                                end: gapDays[gapDays.length - 1],
+                                breakStart,
+                                breakEnd,
+                                totalDays,
+                                workDays,
+                                score: totalDays / workDays,
+                                description: `Bridge ${workDays} day${workDays > 1 ? 's' : ''} for ${totalDays}-day break`
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Sort by efficiency (score) - best opportunities first
+    bridgeOpportunities.sort((a, b) => b.score - a.score);
+    
+    // Remove overlapping opportunities and select best ones
+    const selected = [];
+    let daysUsed = 0;
+    
+    for (const opportunity of bridgeOpportunities) {
+        // Check if this opportunity overlaps with already selected ones
+        const overlaps = selected.some(s => {
+            return isInPeriod(opportunity.start, s) || 
+                   isInPeriod(opportunity.end, s) ||
+                   isInPeriod(s.start, opportunity) ||
+                   isInPeriod(s.end, opportunity);
+        });
+        
+        if (!overlaps && daysUsed + opportunity.workDays <= remainingDays) {
+            selected.push(opportunity);
+            daysUsed += opportunity.workDays;
+        }
+        
+        // Continue until we use all 14 remaining days
+        if (daysUsed >= remainingDays) {
+            break;
+        }
+    }
+    
+    // If we haven't used all 14 days, add longer vacation blocks
+    if (daysUsed < remainingDays) {
+        // Find periods with good weather (spring/fall) for additional vacation
+        const additionalPeriods = [];
+        
+        // Check April, May, September, October for good vacation periods
+        const goodMonths = [3, 4, 8, 9]; // Apr, May, Sep, Oct
+        
+        for (const month of goodMonths) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let day = 1; day <= daysInMonth - 6; day++) {
+                const start = new Date(year, month, day);
+                const end = new Date(start);
+                const daysToAdd = Math.min(7, remainingDays - daysUsed);
+                end.setDate(end.getDate() + daysToAdd - 1);
+                
+                // Check if this period overlaps with main vacation, winter week, or selected bridges
+                const overlapsMain = isInPeriod(start, mainVacation) || isInPeriod(end, mainVacation);
+                const overlapsWinter = isInPeriod(start, winterWeek) || isInPeriod(end, winterWeek);
+                const overlapsSelected = selected.some(s => 
+                    isInPeriod(start, s) || isInPeriod(end, s) ||
+                    isInPeriod(s.start, { start, end }) || isInPeriod(s.end, { start, end })
+                );
+                
+                if (!overlapsMain && !overlapsWinter && !overlapsSelected) {
+                    const workDays = countWorkDays(start, end, holidayDates);
+                    const totalDays = daysToAdd;
+                    
+                    if (workDays > 0 && workDays <= remainingDays - daysUsed) {
+                        additionalPeriods.push({
+                            start,
+                            end,
+                            breakStart: start,
+                            breakEnd: end,
+                            totalDays,
+                            workDays,
+                            score: totalDays / workDays,
+                            description: `${daysToAdd}-day vacation block`
+                        });
+                    }
+                }
+            }
+        }
+        
+        // Sort by score and add best additional periods
+        additionalPeriods.sort((a, b) => b.score - a.score);
+        
+        for (const period of additionalPeriods) {
+            if (daysUsed + period.workDays <= remainingDays) {
+                const overlaps = selected.some(s => {
+                    return isInPeriod(period.start, s) || 
+                           isInPeriod(period.end, s) ||
+                           isInPeriod(s.start, period) ||
+                           isInPeriod(s.end, period);
+                });
+                
+                if (!overlaps) {
+                    selected.push(period);
+                    daysUsed += period.workDays;
+                }
+                
+                if (daysUsed >= remainingDays) {
+                    break;
+                }
+            }
+        }
+    }
+    
+    return selected;
+}
+
+function countHolidaysInPeriod(start, end, holidayDates) {
+    let count = 0;
+    const current = new Date(start);
+    
+    while (current <= end) {
+        if (holidayDates.has(current.getTime())) {
+            count++;
+        }
+        current.setDate(current.getDate() + 1);
+    }
+    
+    return count;
+}
+
+function countWeekendsInPeriod(start, end) {
+    let count = 0;
+    const current = new Date(start);
+    
+    while (current <= end) {
+        if (isWeekend(current)) {
+            count++;
+        }
+        current.setDate(current.getDate() + 1);
+    }
+    
+    return count;
+}
+
+function isWeekend(date) {
+    const day = date.getDay();
+    return day === 0 || day === 6;
+}
+
+function countWorkDays(start, end, holidayDates) {
+    let workDays = 0;
+    const current = new Date(start);
+    
+    while (current <= end) {
+        const dayOfWeek = current.getDay();
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        const isHoliday = holidayDates.has(current.getTime());
+        
+        if (!isWeekend && !isHoliday) {
+            workDays++;
+        }
+        
+        current.setDate(current.getDate() + 1);
+    }
+    
+    return workDays;
+}
+
+function isInPeriod(date, period) {
+    return date >= period.start && date <= period.end;
+}
+
+
+function scrollToCalendarDate(startDate, endDate) {
+    // Scroll to calendar section
+    calendar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Wait for scroll to complete, then highlight dates
+    setTimeout(() => {
+        // Remove any existing highlights
+        document.querySelectorAll('.day-cell.highlight').forEach(cell => {
+            cell.classList.remove('highlight');
+        });
+        
+        // Highlight the date range
+        const current = new Date(startDate);
+        const end = new Date(endDate);
+        
+        while (current <= end) {
+            const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
+            
+            // Find the day cell with this date
+            const dayCells = document.querySelectorAll('.day-cell');
+            dayCells.forEach(cell => {
+                const cellDate = cell.textContent.trim();
+                const cellParent = cell.closest('.month');
+                
+                if (cellParent && cellDate && !cell.classList.contains('empty')) {
+                    const monthHeader = cellParent.querySelector('.month-header');
+                    if (monthHeader) {
+                        const monthName = monthHeader.textContent;
+                        const monthIndex = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                          'July', 'August', 'September', 'October', 'November', 'December'].indexOf(monthName);
+                        
+                        if (monthIndex === current.getMonth() && parseInt(cellDate) === current.getDate()) {
+                            cell.classList.add('highlight');
+                        }
+                    }
+                }
+            });
+            
+            current.setDate(current.getDate() + 1);
+        }
+    }, 500);
+}

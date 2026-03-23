@@ -1,7 +1,7 @@
-# European Public Holidays - Features
+# Vacation Planner - Features
 
 ## Overview
-A comprehensive web application for viewing public holidays and school holidays across 30 European countries with intelligent vacation planning suggestions.
+A comprehensive vacation planning application for viewing public holidays and school holidays across 30 European countries with intelligent vacation planning suggestions.
 
 ## Key Features
 

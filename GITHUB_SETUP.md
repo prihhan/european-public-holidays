@@ -19,8 +19,8 @@ git commit -m "Initial commit: European Public Holidays app with school holidays
 
 1. Go to https://github.com/new
 2. Fill in the details:
-   - **Repository name**: `european-public-holidays`
-   - **Description**: `View public holidays and school holidays from European countries with smart vacation planning`
+   - **Repository name**: `vacation-planner`
+   - **Description**: `Plan your perfect vacation with European public holidays, school holidays, and smart bridge day suggestions`
    - **Visibility**: Choose Public (recommended) or Private
    - **DO NOT** check "Initialize this repository with a README" (we already have one)
 3. Click **"Create repository"**
@@ -30,7 +30,7 @@ git commit -m "Initial commit: European Public Holidays app with school holidays
 After creating the repository, GitHub will show you commands. Use these (replace YOUR_USERNAME with your actual GitHub username):
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/european-public-holidays.git
+git remote add origin https://github.com/YOUR_USERNAME/vacation-planner.git
 git branch -M main
 git push -u origin main
 ```
@@ -53,7 +53,7 @@ To make your app live on the internet:
    - Folder: Select `/ (root)`
 5. Click **"Save"**
 6. Wait 1-2 minutes
-7. Your app will be live at: `https://YOUR_USERNAME.github.io/european-public-holidays/`
+7. Your app will be live at: `https://YOUR_USERNAME.github.io/vacation-planner/`
 
 ## Step 5: Update Repository (After Making Changes)
 
@@ -94,7 +94,7 @@ Make sure you're the owner of the repository or have write access.
 If you get "remote origin already exists":
 ```bash
 git remote remove origin
-git remote add origin https://github.com/YOUR_USERNAME/european-public-holidays.git
+git remote add origin https://github.com/YOUR_USERNAME/vacation-planner.git
 ```
 
 ## What Gets Uploaded
@@ -112,7 +112,7 @@ All files in the project:
 
 After uploading:
 1. Add a nice description to your repository
-2. Add topics/tags: `javascript`, `holidays`, `calendar`, `europe`, `vacation-planner`
+2. Add topics/tags: `javascript`, `holidays`, `calendar`, `europe`, `vacation-planner`, `travel`
 3. Share your live GitHub Pages URL
 4. Consider adding a screenshot to README.md
 

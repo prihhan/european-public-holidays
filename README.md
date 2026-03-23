@@ -1,8 +1,8 @@
-# European Public Holidays
+# Vacation Planner
 
-A simple, elegant web application to view public holidays and school holidays from all European countries with an interactive calendar view and smart vacation planning suggestions.
+A simple, elegant web application to plan your perfect vacation by viewing public holidays and school holidays from all European countries with smart vacation planning suggestions.
 
-![European Public Holidays](https://img.shields.io/badge/countries-30-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)
+![Vacation Planner](https://img.shields.io/badge/countries-30-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)
 
 ## ✨ Features
 
@@ -28,7 +28,7 @@ A simple, elegant web application to view public holidays and school holidays fr
 3. That's it! No build process or installation needed
 
 ### Option 2: Try it Online
-Visit the live demo: `https://YOUR_USERNAME.github.io/european-public-holidays/`
+Visit the live demo: `https://YOUR_USERNAME.github.io/vacation-planner/`
 
 ## 📖 How to Use
 
@@ -61,7 +61,7 @@ The app intelligently suggests strategic days to take off:
 ## 📁 Project Structure
 
 ```
-european-public-holidays/
+vacation-planner/
 ├── index.html          # Main HTML file
 ├── app.js             # JavaScript logic
 ├── style.css          # Styling
@@ -91,7 +91,7 @@ MIT License - Feel free to use this project for any purpose.
 
 ## 📧 Contact
 
-Created with ❤️ for exploring European holidays and planning perfect vacations!
+Created with ❤️ for planning perfect vacations across Europe!
 
 ---
 
