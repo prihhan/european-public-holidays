@@ -404,7 +404,7 @@ function displayBridgeDays(holidays, year) {
         container.appendChild(card);
     });
 
-    bridgeDays.appendChild(makeCollapsible(container, t('bridgeSuggestions')));
+    bridgeDays.appendChild(makeCollapsible(container, t('bridgeSuggestions'), true));
 }
 
 function findBridgeDays(holidays, year) {
@@ -470,7 +470,7 @@ function displaySchoolHolidays(schoolHolidays) {
         container.appendChild(card);
     });
 
-    schoolHolidaysSection.appendChild(makeCollapsible(container, t('schoolHolidays')));
+    schoolHolidaysSection.appendChild(makeCollapsible(container, t('schoolHolidays'), true));
 }
 
 // ── Display: Vacation Planner ─────────────────────────────────────────────────
@@ -548,7 +548,7 @@ function displayVacationPlanner(publicHolidays, schoolHolidays, year) {
         <div class="summary-item"><span class="summary-value">${plan.efficiency}%</span><span class="summary-label">${t('efficiency')}</span></div>
     `;
     container.appendChild(summary);
-    vacationPlannerSection.appendChild(makeCollapsible(container, t('vacationPlan')));
+    vacationPlannerSection.appendChild(makeCollapsible(container, t('vacationPlan'), true));
 }
 
 function makeVacationRow(label, dates, days, workDays, typeClass, scrollStart, scrollEnd) {
