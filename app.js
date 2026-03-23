@@ -285,7 +285,7 @@ function displayHolidays(holidays) {
 function displayCalendar(holidays, schoolHolidays, year) {
     calendar.innerHTML = '';
 
-    // Color legend — sits outside the month grid
+    // Color legend
     const legend = document.createElement('div');
     legend.className = 'calendar-legend';
     const legendItems = [
@@ -313,11 +313,6 @@ function displayCalendar(holidays, schoolHolidays, year) {
 
     const months = t('months');
     const dayNames = t('days');
-
-    // Separate grid wrapper so the legend doesn't get grid-treated
-    const monthsGrid = document.createElement('div');
-    monthsGrid.className = 'months-grid';
-    calendar.appendChild(monthsGrid);
 
     for (let month = 0; month < 12; month++) {
         const monthDiv = document.createElement('div');
@@ -386,7 +381,7 @@ function displayCalendar(holidays, schoolHolidays, year) {
         }
 
         monthDiv.appendChild(grid);
-        monthsGrid.appendChild(monthDiv);
+        calendar.appendChild(monthDiv);
     }
 }
 
