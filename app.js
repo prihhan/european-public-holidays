@@ -225,12 +225,16 @@ async function loadHolidays() {
 
         const publicHolidays = await publicHolidaysResponse.json();
         
-        // Fetch school holidays from OpenHolidays API
+        // Fetch school holidays - use official Estonian data for EE, OpenHolidays API for others
         let schoolHolidays = [];
         try {
-            const schoolHolidaysResponse = await fetch(`https://openholidaysapi.org/SchoolHolidays?countryIsoCode=${countryCode}&languageIsoCode=EN&validFrom=${year}-01-01&validTo=${year}-12-31`);
-            if (schoolHolidaysResponse.ok) {
-                schoolHolidays = await schoolHolidaysResponse.json();
+            if (countryCode === 'EE') {
+                schoolHolidays = getEstonianSchoolHolidays(parseInt(year));
+            } else {
+                const schoolHolidaysResponse = await fetch(`https://openholidaysapi.org/SchoolHolidays?countryIsoCode=${countryCode}&languageIsoCode=EN&validFrom=${year}-01-01&validTo=${year}-12-31`);
+                if (schoolHolidaysResponse.ok) {
+                    schoolHolidays = await schoolHolidaysResponse.json();
+                }
             }
         } catch (err) {
             console.log('School holidays not available for this country');
@@ -777,6 +781,80 @@ function displayVacationPlanner(publicHolidays, schoolHolidays, year) {
     container.appendChild(summary);
 
     vacationPlannerSection.appendChild(container);
+}
+
+// Official Estonian school holidays from Haridus- ja Teadusministeerium / Tallinna Haridusamet
+// Source: https://www.tallinn.ee/haridus/koolivaheajad & https://www.hm.ee
+// Returns array in same format as OpenHolidays API for compatibility
+function getEstonianSchoolHolidays(year) {
+    // Each school year spans two calendar years (e.g. 2025/2026)
+    // We return holidays that fall within the requested calendar year
+    const schedule = {
+        // 2023/2024
+        2023: [
+            { name: 'Sügisvaheaeg', start: '2023-10-23', end: '2023-10-29' },
+            { name: 'Jõuluvaheaeg', start: '2023-12-27', end: '2024-01-07' },
+        ],
+        2024: [
+            { name: 'Jõuluvaheaeg', start: '2023-12-27', end: '2024-01-07' },   // continues from 2023
+            { name: 'Talvine vaheaeg', start: '2024-02-19', end: '2024-02-25' },
+            { name: 'Kevadvaheaeg', start: '2024-04-22', end: '2024-04-28' },
+            { name: 'Suvevaheaeg', start: '2024-06-10', end: '2024-08-31' },
+            { name: 'Sügisvaheaeg', start: '2024-10-21', end: '2024-10-27' },
+            { name: 'Jõuluvaheaeg', start: '2024-12-23', end: '2025-01-05' },
+        ],
+        2025: [
+            { name: 'Jõuluvaheaeg', start: '2024-12-23', end: '2025-01-05' },   // continues from 2024
+            { name: 'Talvine vaheaeg', start: '2025-02-24', end: '2025-03-02' },
+            { name: 'Kevadvaheaeg', start: '2025-04-14', end: '2025-04-20' },
+            { name: 'Suvevaheaeg', start: '2025-06-10', end: '2025-08-31' },
+            { name: 'Sügisvaheaeg', start: '2025-10-20', end: '2025-10-26' },
+            { name: 'Jõuluvaheaeg', start: '2025-12-22', end: '2026-01-11' },
+        ],
+        2026: [
+            { name: 'Jõuluvaheaeg', start: '2025-12-22', end: '2026-01-11' },   // continues from 2025
+            { name: 'Talvine vaheaeg', start: '2026-02-23', end: '2026-03-01' },
+            { name: 'Kevadvaheaeg', start: '2026-04-13', end: '2026-04-19' },
+            { name: 'Suvevaheaeg', start: '2026-06-17', end: '2026-08-31' },
+            { name: 'Sügisvaheaeg', start: '2026-10-26', end: '2026-11-01' },
+            { name: 'Jõuluvaheaeg', start: '2026-12-21', end: '2027-01-03' },
+        ],
+        2027: [
+            { name: 'Jõuluvaheaeg', start: '2026-12-21', end: '2027-01-03' },   // continues from 2026
+            { name: 'Talvine vaheaeg', start: '2027-02-22', end: '2027-02-28' },
+            { name: 'Kevadvaheaeg', start: '2027-04-12', end: '2027-04-18' },
+            { name: 'Suvevaheaeg', start: '2027-06-09', end: '2027-08-31' },
+        ],
+    };
+
+    const entries = schedule[year] || [];
+
+    // Deduplicate (cross-year entries appear in both years)
+    const seen = new Set();
+    const unique = entries.filter(e => {
+        const key = e.start + e.end;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+
+    // Convert to OpenHolidays-compatible format
+    return unique.map(e => ({
+        name: [{ language: 'ET', text: e.name }, { language: 'EN', text: translateEstonianHoliday(e.name) }],
+        startDate: e.start,
+        endDate: e.end,
+    }));
+}
+
+function translateEstonianHoliday(name) {
+    const map = {
+        'Sügisvaheaeg': 'Autumn Break',
+        'Jõuluvaheaeg': 'Christmas Break',
+        'Talvine vaheaeg': 'Winter Break',
+        'Kevadvaheaeg': 'Spring Break',
+        'Suvevaheaeg': 'Summer Break',
+    };
+    return map[name] || name;
 }
 
 function calculateOptimalVacation(publicHolidays, schoolHolidays, year) {
