@@ -1,4 +1,5 @@
 // ── i18n ────────────────────────────────────────────────────────────────────
+// v1.4 - fix school holiday calendar coloring
 const TRANSLATIONS = {
     en: {
         title: 'Estonia Vacation Planner',
