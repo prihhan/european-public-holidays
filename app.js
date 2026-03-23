@@ -347,6 +347,42 @@ function displayCalendar(holidays, schoolHolidays, year) {
     }
 }
 
+// ── Collapsible section wrapper ───────────────────────────────────────────────
+function makeCollapsible(containerEl, titleText, startCollapsed = false) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'collapsible-wrapper';
+
+    const header = document.createElement('div');
+    header.className = 'collapsible-header';
+
+    const icon = document.createElement('span');
+    icon.className = 'collapsible-icon';
+    icon.textContent = startCollapsed ? '▶' : '▼';
+
+    const title = document.createElement('span');
+    title.textContent = titleText;
+
+    header.appendChild(icon);
+    header.appendChild(title);
+
+    const body = document.createElement('div');
+    body.className = 'collapsible-body';
+    body.style.display = startCollapsed ? 'none' : 'block';
+
+    // Move containerEl into body
+    body.appendChild(containerEl);
+
+    header.addEventListener('click', () => {
+        const collapsed = body.style.display === 'none';
+        body.style.display = collapsed ? 'block' : 'none';
+        icon.textContent = collapsed ? '▼' : '▶';
+    });
+
+    wrapper.appendChild(header);
+    wrapper.appendChild(body);
+    return wrapper;
+}
+
 // ── Display: Bridge Days ──────────────────────────────────────────────────────
 function displayBridgeDays(holidays, year) {
     bridgeDays.innerHTML = '';
@@ -355,10 +391,6 @@ function displayBridgeDays(holidays, year) {
 
     const container = document.createElement('div');
     container.className = 'bridge-container';
-
-    const h3 = document.createElement('h3');
-    h3.textContent = t('bridgeSuggestions');
-    container.appendChild(h3);
 
     suggestions.forEach(s => {
         const card = document.createElement('div');
@@ -372,7 +404,7 @@ function displayBridgeDays(holidays, year) {
         container.appendChild(card);
     });
 
-    bridgeDays.appendChild(container);
+    bridgeDays.appendChild(makeCollapsible(container, t('bridgeSuggestions')));
 }
 
 function findBridgeDays(holidays, year) {
@@ -413,10 +445,6 @@ function displaySchoolHolidays(schoolHolidays) {
     const container = document.createElement('div');
     container.className = 'school-holidays-container';
 
-    const h3 = document.createElement('h3');
-    h3.textContent = t('schoolHolidays');
-    container.appendChild(h3);
-
     schoolHolidays.forEach(sh => {
         const start = parseLocalDate(sh.startDate);
         const end = parseLocalDate(sh.endDate);
@@ -442,7 +470,7 @@ function displaySchoolHolidays(schoolHolidays) {
         container.appendChild(card);
     });
 
-    schoolHolidaysSection.appendChild(container);
+    schoolHolidaysSection.appendChild(makeCollapsible(container, t('schoolHolidays')));
 }
 
 // ── Display: Vacation Planner ─────────────────────────────────────────────────
@@ -453,10 +481,6 @@ function displayVacationPlanner(publicHolidays, schoolHolidays, year) {
 
     const container = document.createElement('div');
     container.className = 'vacation-planner-container';
-
-    const h3 = document.createElement('h3');
-    h3.textContent = t('vacationPlan');
-    container.appendChild(h3);
 
     const note = document.createElement('p');
     note.className = 'vacation-note';
@@ -524,7 +548,7 @@ function displayVacationPlanner(publicHolidays, schoolHolidays, year) {
         <div class="summary-item"><span class="summary-value">${plan.efficiency}%</span><span class="summary-label">${t('efficiency')}</span></div>
     `;
     container.appendChild(summary);
-    vacationPlannerSection.appendChild(container);
+    vacationPlannerSection.appendChild(makeCollapsible(container, t('vacationPlan')));
 }
 
 function makeVacationRow(label, dates, days, workDays, typeClass, scrollStart, scrollEnd) {
