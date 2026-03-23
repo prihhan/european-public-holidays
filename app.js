@@ -314,6 +314,10 @@ function displayCalendar(holidays, schoolHolidays, year) {
     const months = t('months');
     const dayNames = t('days');
 
+    const monthsGrid = document.createElement('div');
+    monthsGrid.className = 'months-grid';
+    calendar.appendChild(monthsGrid);
+
     for (let month = 0; month < 12; month++) {
         const monthDiv = document.createElement('div');
         monthDiv.className = 'month';
@@ -381,7 +385,7 @@ function displayCalendar(holidays, schoolHolidays, year) {
         }
 
         monthDiv.appendChild(grid);
-        calendar.appendChild(monthDiv);
+        monthsGrid.appendChild(monthDiv);
     }
 }
 
