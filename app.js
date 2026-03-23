@@ -3,7 +3,6 @@
 const TRANSLATIONS = {
     en: {
         title: 'Estonia Vacation Planner',
-        load: 'Load',
         loading: 'Loading...',
         publicHolidays: 'Public Holidays',
         schoolHolidays: '🎒 School Holidays',
@@ -37,7 +36,6 @@ const TRANSLATIONS = {
     },
     ru: {
         title: 'Планировщик отпуска — Эстония',
-        load: 'Загрузить',
         loading: 'Загрузка...',
         publicHolidays: 'Государственные праздники',
         schoolHolidays: '🎒 Школьные каникулы',
