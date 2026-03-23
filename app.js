@@ -272,6 +272,26 @@ function displayCalendar(holidays, schoolHolidays, year) {
     flagWrap.innerHTML = `<img src="https://flagcdn.com/w1280/ee.png" alt="Estonia" style="width:100%;height:auto;display:block;">`;
     calendar.appendChild(flagWrap);
 
+    // Color legend
+    const legend = document.createElement('div');
+    legend.className = 'calendar-legend';
+    const legendItems = currentLang === 'ru'
+        ? [
+            { cls: 'holiday',       label: 'Государственный праздник (нерабочий день)' },
+            { cls: 'school-holiday', label: 'Школьные каникулы' },
+          ]
+        : [
+            { cls: 'holiday',       label: 'Public holiday (day off work)' },
+            { cls: 'school-holiday', label: 'School holiday' },
+          ];
+    legendItems.forEach(({ cls, label }) => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        item.innerHTML = `<span class="legend-dot ${cls}"></span><span class="legend-label">${label}</span>`;
+        legend.appendChild(item);
+    });
+    calendar.appendChild(legend);
+
     const holidayMap = {};
     holidays.forEach(h => { holidayMap[h.date] = h; });
     const holidayDatesSet = new Set(holidays.map(h => h.date));
@@ -285,6 +305,25 @@ function displayCalendar(holidays, schoolHolidays, year) {
 
     const months = t('months');
     const dayNames = t('days');
+
+    // Shared tooltip element
+    const tooltip = document.createElement('div');
+    tooltip.className = 'cal-tooltip';
+    document.body.appendChild(tooltip);
+
+    function showTooltip(e, text) {
+        tooltip.textContent = text;
+        tooltip.classList.add('visible');
+        positionTooltip(e);
+    }
+    function positionTooltip(e) {
+        const x = e.clientX + 12;
+        const y = e.clientY - 36;
+        const maxX = window.innerWidth - tooltip.offsetWidth - 8;
+        tooltip.style.left = Math.min(x, maxX) + 'px';
+        tooltip.style.top = Math.max(y, 8) + 'px';
+    }
+    function hideTooltip() { tooltip.classList.remove('visible'); }
 
     for (let month = 0; month < 12; month++) {
         const monthDiv = document.createElement('div');
@@ -321,8 +360,13 @@ function displayCalendar(holidays, schoolHolidays, year) {
             const cell = document.createElement('div');
             cell.className = 'day-cell';
 
+            let tooltipText = null;
+
             const schoolRange = schoolRanges.find(r => curDate >= r.start && curDate <= r.end);
-            if (schoolRange) { cell.classList.add('school-holiday'); cell.title = schoolRange.name; }
+            if (schoolRange) {
+                cell.classList.add('school-holiday');
+                tooltipText = schoolRange.name;
+            }
 
             if (holidayDatesSet.has(dateStr)) {
                 const h = holidayMap[dateStr];
@@ -333,7 +377,13 @@ function displayCalendar(holidays, schoolHolidays, year) {
                 if (isShortened || (h.global === false && h.types && !h.types.includes('Public'))) {
                     cell.classList.add('shortened');
                 }
-                cell.title = `${currentLang === 'ru' ? (h.nameRu || h.name) : (h.localName || h.name)}\n${h.types?.join(', ') || ''}`;
+                tooltipText = currentLang === 'ru' ? (h.nameRu || h.name) : (h.localName || h.name);
+            }
+
+            if (tooltipText) {
+                cell.addEventListener('mouseenter', e => showTooltip(e, tooltipText));
+                cell.addEventListener('mousemove', positionTooltip);
+                cell.addEventListener('mouseleave', hideTooltip);
             }
 
             cell.textContent = day;

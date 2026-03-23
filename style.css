@@ -558,10 +558,70 @@ h1 {
     background: #e0e0e0;
 }
 
+/* ── Calendar legend ─────────────────────────────────────────────────────── */
+.calendar-legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #444;
+}
+
+.legend-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.legend-dot.holiday {
+    background: #dc3545;
+}
+
+.legend-dot.school-holiday {
+    background: #ffe066;
+    border: 1px solid #e0c800;
+}
+
+/* ── Custom calendar tooltip ─────────────────────────────────────────────── */
+.cal-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: rgba(30, 30, 40, 0.92);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.cal-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .calendar {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
+}
 }
 
 .month {
