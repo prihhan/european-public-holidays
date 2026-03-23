@@ -289,8 +289,8 @@ function displayCalendar(holidays, schoolHolidays, year) {
     const legend = document.createElement('div');
     legend.className = 'calendar-legend';
     const legendItems = [
-        { cls: 'holiday',        label: currentLang === 'ru' ? '🔴 Государственный праздник — нерабочий день' : '🔴 Public holiday — day off work' },
-        { cls: 'school-holiday', label: currentLang === 'ru' ? '🟡 Школьные каникулы'                         : '🟡 School holiday' },
+        { cls: 'holiday',        label: currentLang === 'ru' ? 'Государственный праздник — нерабочий день' : 'Public holiday — day off work' },
+        { cls: 'school-holiday', label: currentLang === 'ru' ? 'Школьные каникулы'                         : 'School holiday' },
     ];
     legendItems.forEach(({ cls, label }) => {
         const item = document.createElement('div');
