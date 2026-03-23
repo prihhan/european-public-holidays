@@ -237,14 +237,14 @@ h1 {
 }
 
 .school-holidays-container {
-    background: linear-gradient(135deg, #ffc9e5 0%, #ffb3d9 100%);
+    background: linear-gradient(135deg, #fff3b0 0%, #ffe066 100%);
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(255, 182, 217, 0.3);
 }
 
 .school-holidays-container h3 {
-    color: #d63384;
+    color: #b8860b;
 }
 
 .school-holiday-card {
@@ -589,14 +589,14 @@ h1 {
 
 
 .day-cell.school-holiday {
-    background: #ffb6d9;
+    background: #ffe066;
     color: #333;
     font-weight: 600;
     cursor: help;
 }
 
 .day-cell.school-holiday:hover {
-    background: #ff99cc;
+    background: #ffd700;
     transform: scale(1.1);
     transition: all 0.2s;
 }
