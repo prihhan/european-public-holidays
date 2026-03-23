@@ -128,12 +128,6 @@ h1 {
     transform: rotate(-90deg);
 }
 
-.calendar-flag-header {
-    margin-bottom: 20px;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
 .vacation-note {
     color: white;
     font-size: 13px;
@@ -561,13 +555,15 @@ h1 {
 /* ── Calendar legend ─────────────────────────────────────────────────────── */
 .calendar-legend {
     display: flex;
-    gap: 20px;
+    gap: 24px;
     flex-wrap: wrap;
-    padding: 12px 16px;
-    background: #f8f9fa;
+    padding: 12px 18px;
+    background: #fff;
     border-radius: 8px;
     margin-bottom: 20px;
     border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    grid-column: 1 / -1;
 }
 
 .legend-item {

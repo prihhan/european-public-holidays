@@ -285,24 +285,13 @@ function displayHolidays(holidays) {
 function displayCalendar(holidays, schoolHolidays, year) {
     calendar.innerHTML = '';
 
-    // Flag header
-    const flagWrap = document.createElement('div');
-    flagWrap.className = 'calendar-flag-header';
-    flagWrap.innerHTML = `<img src="https://flagcdn.com/w1280/ee.png" alt="Estonia" style="width:100%;height:auto;display:block;">`;
-    calendar.appendChild(flagWrap);
-
     // Color legend
     const legend = document.createElement('div');
     legend.className = 'calendar-legend';
-    const legendItems = currentLang === 'ru'
-        ? [
-            { cls: 'holiday',       label: 'Государственный праздник (нерабочий день)' },
-            { cls: 'school-holiday', label: 'Школьные каникулы' },
-          ]
-        : [
-            { cls: 'holiday',       label: 'Public holiday (day off work)' },
-            { cls: 'school-holiday', label: 'School holiday' },
-          ];
+    const legendItems = [
+        { cls: 'holiday',        label: currentLang === 'ru' ? '🔴 Государственный праздник — нерабочий день' : '🔴 Public holiday — day off work' },
+        { cls: 'school-holiday', label: currentLang === 'ru' ? '🟡 Школьные каникулы'                         : '🟡 School holiday' },
+    ];
     legendItems.forEach(({ cls, label }) => {
         const item = document.createElement('div');
         item.className = 'legend-item';
