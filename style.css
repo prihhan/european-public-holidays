@@ -666,11 +666,11 @@ h1 {
 }
 
 .day-header {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
-    color: #999;
+    color: #888;
     text-align: center;
-    padding: 3px 1px;
+    padding: 5px 2px;
     text-transform: uppercase;
 }
 
@@ -687,19 +687,18 @@ h1 {
     align-items: center;
     justify-content: center;
     border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
     cursor: default;
     background: #fff;
-    gap: 1px;
-    padding: 2px 1px;
+    gap: 2px;
+    padding: 3px 2px;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .cell-day {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
     line-height: 1;
+    color: #222;
 }
 
 .cell-today-dot {
@@ -722,9 +721,9 @@ h1 {
 
 .cell-temps {
     display: flex;
-    gap: 2px;
-    font-size: 9px;
-    font-weight: 500;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
     line-height: 1;
 }
 
@@ -759,6 +758,10 @@ h1 {
 .day-cell.weekend:not(.holiday):not(.school-holiday) {
     color: #c0392b;
     background: #fff5f5;
+}
+
+.day-cell.weekend:not(.holiday):not(.school-holiday) .cell-day {
+    color: #c0392b;
 }
 
 .day-cell.today {
