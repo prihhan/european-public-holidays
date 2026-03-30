@@ -630,7 +630,7 @@ h1 {
 
 .months-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
     gap: 14px;
 }
 
@@ -695,7 +695,7 @@ h1 {
 }
 
 .cell-day {
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 700;
     line-height: 1;
     color: #222;
@@ -721,8 +721,8 @@ h1 {
 
 .cell-temps {
     display: flex;
-    gap: 3px;
-    font-size: 11px;
+    gap: 4px;
+    font-size: 13px;
     font-weight: 600;
     line-height: 1;
 }
