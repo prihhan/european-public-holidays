@@ -683,7 +683,36 @@ h1 {
     background: #fff5f5;
 }
 
-.day-cell.today {
+.day-cell.has-weather {
+    flex-direction: column;
+    gap: 1px;
+    padding: 2px 1px;
+    cursor: default;
+}
+
+.cell-day {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.cell-temps {
+    font-size: 8px;
+    font-weight: 500;
+    opacity: 0.85;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.day-cell.today .cell-day,
+.day-cell.today .cell-temps {
+    color: white;
+}
+
+.day-cell.holiday .cell-temps,
+.day-cell.school-holiday .cell-temps {
+    opacity: 0.75;
+}
     background: #667eea !important;
     color: white !important;
     font-weight: 700;

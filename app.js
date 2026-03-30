@@ -149,10 +149,11 @@ async function loadHolidays() {
     try {
         const publicHolidays = getEstonianPublicHolidays(currentYear);
         const schoolHolidays = getEstonianSchoolHolidays(currentYear);
+        const weather = await fetchWeather();
 
         hideLoading();
         displayHolidays(publicHolidays);
-        displayCalendar(publicHolidays, schoolHolidays, currentYear);
+        displayCalendar(publicHolidays, schoolHolidays, currentYear, weather);
         displayBridgeDays(publicHolidays, currentYear);
         displaySchoolHolidays(schoolHolidays);
         displayVacationPlanner(publicHolidays, schoolHolidays, currentYear);
@@ -282,7 +283,7 @@ function displayHolidays(holidays) {
 }
 
 // ── Display: Calendar ─────────────────────────────────────────────────────────
-function displayCalendar(holidays, schoolHolidays, year) {
+function displayCalendar(holidays, schoolHolidays, year, weather = {}) {
     calendar.innerHTML = '';
 
     // Color legend
@@ -386,7 +387,26 @@ function displayCalendar(holidays, schoolHolidays, year) {
                 cell.addEventListener('mouseleave', hideCalTooltip);
             }
 
-            cell.textContent = day;
+            const w = weather[dateStr];
+            if (w) {
+                cell.classList.add('has-weather');
+                const dayNum = document.createElement('span');
+                dayNum.className = 'cell-day';
+                dayNum.textContent = day;
+                const temps = document.createElement('span');
+                temps.className = 'cell-temps';
+                temps.textContent = `${w.max}°/${w.min}°`;
+                cell.appendChild(dayNum);
+                cell.appendChild(temps);
+                // Append weather to tooltip
+                const wText = `${w.max}°C / ${w.min}°C`;
+                const fullTip = tooltipText ? `${tooltipText} · ${wText}` : wText;
+                cell.addEventListener('mouseenter', e => showCalTooltip(e, fullTip));
+                cell.addEventListener('mousemove', moveCalTooltip);
+                cell.addEventListener('mouseleave', hideCalTooltip);
+            } else {
+                cell.textContent = day;
+            }
             grid.appendChild(cell);
         }
 
@@ -783,7 +803,28 @@ function findOptimalBridgeDays(year, holidayDates, mainVacation, winterWeek) {
     return selected;
 }
 
-// ── Estonian public holidays (official, from riigipühad.ee) ──────────────────
+// ── Weather forecast (Open-Meteo, Tallinn, no API key needed) ────────────────
+let weatherCache = null; // { date: { min, max } }
+
+async function fetchWeather() {
+    if (weatherCache) return weatherCache;
+    try {
+        const res = await fetch(
+            'https://api.open-meteo.com/v1/forecast?latitude=59.437&longitude=24.7536&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FTallinn&forecast_days=16'
+        );
+        const data = await res.json();
+        weatherCache = {};
+        data.daily.time.forEach((date, i) => {
+            weatherCache[date] = {
+                min: Math.round(data.daily.temperature_2m_min[i]),
+                max: Math.round(data.daily.temperature_2m_max[i])
+            };
+        });
+    } catch (e) {
+        weatherCache = {};
+    }
+    return weatherCache;
+}
 // Fixed holidays + Easter-based holidays calculated per year
 // Names: ET (Estonian), EN (English), RU (Russian)
 // Types: Riigipüha = public holiday, Rahvuspüha = national holiday
