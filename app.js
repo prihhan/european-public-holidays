@@ -323,8 +323,13 @@ function displayCalendar(holidays, schoolHolidays, year, weather = {}) {
         const monthDiv = document.createElement('div');
         monthDiv.className = 'month';
 
+        const season = month <= 1 || month === 11 ? 'winter'
+            : month <= 4 ? 'spring'
+            : month <= 7 ? 'summer'
+            : 'autumn';
+
         const mh = document.createElement('div');
-        mh.className = 'month-header';
+        mh.className = `month-header season-${season}`;
         mh.textContent = months[month];
         monthDiv.appendChild(mh);
 

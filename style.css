@@ -637,10 +637,14 @@ h1 {
     color: #fff;
     text-align: center;
     padding: 7px 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     letter-spacing: 0.4px;
     text-transform: uppercase;
 }
+
+.season-spring { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
+.season-summer { background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%); color: #5a3a00 !important; }
+.season-autumn { background: linear-gradient(135deg, #c94b4b 0%, #e8a87c 100%); }
+.season-winter { background: linear-gradient(135deg, #4facfe 0%, #a8edea 100%); color: #1a3a5c !important; }
 
 .days-grid {
     display: grid;
