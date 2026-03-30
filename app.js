@@ -149,7 +149,7 @@ async function loadHolidays() {
     try {
         const publicHolidays = getEstonianPublicHolidays(currentYear);
         const schoolHolidays = getEstonianSchoolHolidays(currentYear);
-        const weather = await fetchWeather();
+        const weather = await fetchWeather(currentYear);
 
         hideLoading();
         displayHolidays(publicHolidays);
@@ -341,6 +341,7 @@ function displayCalendar(holidays, schoolHolidays, year, weather = {}) {
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const startOffset = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+        const today = new Date();
 
         for (let i = 0; i < startOffset; i++) {
             const e = document.createElement('div');
@@ -356,7 +357,6 @@ function displayCalendar(holidays, schoolHolidays, year, weather = {}) {
             if (isWeekend(curDate)) cell.classList.add('weekend');
 
             // Highlight today
-            const today = new Date();
             if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
                 cell.classList.add('today');
             }
@@ -388,24 +388,38 @@ function displayCalendar(holidays, schoolHolidays, year, weather = {}) {
             }
 
             const w = weather[dateStr];
+            const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+
+            const dayNum = document.createElement('span');
+            dayNum.className = 'cell-day';
+            dayNum.textContent = day;
+            cell.appendChild(dayNum);
+
+            if (isToday) {
+                const dot = document.createElement('span');
+                dot.className = 'cell-today-dot';
+                cell.appendChild(dot);
+            }
+
             if (w) {
                 cell.classList.add('has-weather');
-                const dayNum = document.createElement('span');
-                dayNum.className = 'cell-day';
-                dayNum.textContent = day;
                 const temps = document.createElement('span');
                 temps.className = 'cell-temps';
-                temps.textContent = `${w.max}°/${w.min}°`;
-                cell.appendChild(dayNum);
+                temps.innerHTML = `<span class="temp-max">${w.max}°</span><span class="temp-min">${w.min}°</span>`;
                 cell.appendChild(temps);
-                // Append weather to tooltip
-                const wText = `${w.max}°C / ${w.min}°C`;
-                const fullTip = tooltipText ? `${tooltipText} · ${wText}` : wText;
+                const tipWeather = `${w.max}°C / ${w.min}°C`;
+                const fullTip = tooltipText ? `${tooltipText} · ${tipWeather}` : tipWeather;
                 cell.addEventListener('mouseenter', e => showCalTooltip(e, fullTip));
                 cell.addEventListener('mousemove', moveCalTooltip);
                 cell.addEventListener('mouseleave', hideCalTooltip);
             } else {
-                cell.textContent = day;
+                cell.textContent = '';
+                cell.appendChild(dayNum);
+                if (isToday) {
+                    const dot = document.createElement('span');
+                    dot.className = 'cell-today-dot';
+                    cell.appendChild(dot);
+                }
             }
             grid.appendChild(cell);
         }
@@ -803,28 +817,59 @@ function findOptimalBridgeDays(year, holidayDates, mainVacation, winterWeek) {
     return selected;
 }
 
-// ── Weather forecast (Open-Meteo, Tallinn, no API key needed) ────────────────
-let weatherCache = null; // { date: { min, max } }
+// ── Weather (Open-Meteo — same ECMWF/GFS models as Gismeteo) ─────────────────
+// Forecast API: up to 16 days ahead
+// Historical Forecast API: past days of current month
+const weatherCache = {};
 
-async function fetchWeather() {
-    if (weatherCache) return weatherCache;
+async function fetchWeather(year) {
+    if (weatherCache[year]) return weatherCache[year];
+
+    const lat = 59.437, lon = 24.7536; // Tallinn
+    const today = new Date();
+    const result = {};
+
     try {
-        const res = await fetch(
-            'https://api.open-meteo.com/v1/forecast?latitude=59.437&longitude=24.7536&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FTallinn&forecast_days=16'
-        );
-        const data = await res.json();
-        weatherCache = {};
-        data.daily.time.forEach((date, i) => {
-            weatherCache[date] = {
-                min: Math.round(data.daily.temperature_2m_min[i]),
-                max: Math.round(data.daily.temperature_2m_max[i])
+        // Always fetch 16-day forecast
+        const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+            `&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FTallinn&forecast_days=16`;
+        const fRes = await fetch(fUrl);
+        const fData = await fRes.json();
+        fData.daily.time.forEach((date, i) => {
+            result[date] = {
+                min: Math.round(fData.daily.temperature_2m_min[i]),
+                max: Math.round(fData.daily.temperature_2m_max[i])
             };
         });
+
+        // For current year: also fetch past days of the current month from historical forecast API
+        if (year === today.getFullYear()) {
+            const monthStart = `${year}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+            const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+            const yStr = toDateStr(yesterday);
+            if (yStr >= monthStart) {
+                const hUrl = `https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+                    `&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FTallinn` +
+                    `&start_date=${monthStart}&end_date=${yStr}`;
+                const hRes = await fetch(hUrl);
+                const hData = await hRes.json();
+                hData.daily.time.forEach((date, i) => {
+                    result[date] = {
+                        min: Math.round(hData.daily.temperature_2m_min[i]),
+                        max: Math.round(hData.daily.temperature_2m_max[i])
+                    };
+                });
+            }
+        }
     } catch (e) {
-        weatherCache = {};
+        console.warn('Weather fetch failed', e);
     }
-    return weatherCache;
+
+    weatherCache[year] = result;
+    return result;
 }
+
+// ── Estonian public holidays (official, from riigipühad.ee) ──────────────────
 // Fixed holidays + Easter-based holidays calculated per year
 // Names: ET (Estonian), EN (English), RU (Russian)
 // Types: Riigipüha = public holiday, Rahvuspüha = national holiday

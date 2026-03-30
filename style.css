@@ -619,9 +619,10 @@ h1 {
 
 .months-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
 }
+
 
 .month {
     background: #f8f9fa;
@@ -667,6 +668,7 @@ h1 {
 .day-cell {
     aspect-ratio: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
@@ -674,8 +676,69 @@ h1 {
     font-weight: 500;
     cursor: default;
     background: #fff;
+    gap: 1px;
+    padding: 2px 1px;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+
+.cell-day {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.cell-today-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #667eea;
+    display: block;
+    margin-top: 1px;
+}
+
+.day-cell.today .cell-today-dot {
+    background: white;
+}
+
+.day-cell.holiday .cell-today-dot,
+.day-cell.school-holiday .cell-today-dot {
+    background: rgba(255,255,255,0.8);
+}
+
+.cell-temps {
+    display: flex;
+    gap: 2px;
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.temp-max {
+    color: #e74c3c;
+}
+
+.temp-min {
+    color: #3498db;
+}
+
+.day-cell.today .temp-max,
+.day-cell.today .temp-min,
+.day-cell.today .cell-day {
+    color: white;
+}
+
+.day-cell.holiday .cell-temps,
+.day-cell.school-holiday .cell-temps {
+    opacity: 0.85;
+}
+
+.day-cell.holiday .temp-max,
+.day-cell.holiday .temp-min {
+    color: rgba(255,255,255,0.9);
+}
+
+.day-cell.school-holiday .temp-max { color: #c0392b; }
+.day-cell.school-holiday .temp-min { color: #2980b9; }
 
 /* Weekends colored in JS via .weekend class */
 .day-cell.weekend:not(.holiday):not(.school-holiday) {
@@ -683,36 +746,7 @@ h1 {
     background: #fff5f5;
 }
 
-.day-cell.has-weather {
-    flex-direction: column;
-    gap: 1px;
-    padding: 2px 1px;
-    cursor: default;
-}
-
-.cell-day {
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1;
-}
-
-.cell-temps {
-    font-size: 8px;
-    font-weight: 500;
-    opacity: 0.85;
-    line-height: 1;
-    white-space: nowrap;
-}
-
-.day-cell.today .cell-day,
-.day-cell.today .cell-temps {
-    color: white;
-}
-
-.day-cell.holiday .cell-temps,
-.day-cell.school-holiday .cell-temps {
-    opacity: 0.75;
-}
+.day-cell.today {
     background: #667eea !important;
     color: white !important;
     font-weight: 700;
