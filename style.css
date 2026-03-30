@@ -695,7 +695,7 @@ h1 {
 }
 
 .cell-day {
-    font-size: 22px;
+    font-size: 29px;
     font-weight: 700;
     line-height: 1;
     color: #222;
@@ -722,7 +722,7 @@ h1 {
 .cell-temps {
     display: flex;
     gap: 4px;
-    font-size: 13px;
+    font-size: 17px;
     font-weight: 600;
     line-height: 1;
 }
